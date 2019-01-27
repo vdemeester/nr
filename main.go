@@ -33,12 +33,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	config, err := ioutil.ReadFile(filepath.Join(home, conf))
-	if err != nil {
-		log.Fatal(err)
+	if len(os.Args) != 2 {
+		log.Fatal("expected only one argument (name of the alias file)")
 	}
-	aliases := []alias{}
-	if err := json.Unmarshal(config, &aliases); err != nil {
+	aliases, err := readAliases(filepath.Join(home, conf, os.Args[1]))
+	if err != nil {
 		log.Fatal(err)
 	}
 	if err := cleanGenerated(home); err != nil {
@@ -47,7 +46,18 @@ func main() {
 	if err := generate(home, aliases); err != nil {
 		log.Fatal(err)
 	}
+}
 
+func readAliases(path string) ([]alias, error) {
+	aliases := []alias{}
+	config, err := ioutil.ReadFile(path)
+	if err != nil {
+		return aliases, err
+	}
+	if err := json.Unmarshal(config, &aliases); err != nil {
+		return aliases, err
+	}
+	return aliases, nil
 }
 
 func cleanGenerated(home string) error {

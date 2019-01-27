@@ -36,7 +36,9 @@ func main() {
 	if len(os.Args) != 2 {
 		log.Fatal("expected only one argument (name of the alias file)")
 	}
-	aliases, err := readAliases(filepath.Join(home, conf, os.Args[1]))
+	profile := os.Args[1]
+	fmt.Println("> nr generate", profile)
+	aliases, err := readAliases(filepath.Join(home, conf, profile))
 	if err != nil {
 		log.Fatal(err)
 	}

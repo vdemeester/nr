@@ -107,7 +107,11 @@ func generate(home string, aliases []alias) error {
 			if channel == "" {
 				channel = "nixpkgs"
 			}
-			c := []string{"nix", "run", channel + "." + pkg, "-c", a.Command}
+			c := []string{"nix", "run"}
+			if channel != "nixpkgs" {
+				c = append(c, "-f", "~/.config/nixpkgs/channels.nix")
+			}
+			c = append(c, channel+"."+pkg, "-c", a.Command)
 			f, err := os.Create(filepath.Join(home, "bin", a.Command))
 			if err != nil {
 				return err

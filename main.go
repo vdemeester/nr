@@ -56,7 +56,7 @@ func readAliases(path string) ([]alias, error) {
 	if err != nil {
 		return aliases, err
 	}
-	if err := json.Unmarshal(config, &aliases); err != nil {
+	if err := json.NewDecoder(strings.NewReader(string(config))).Decode(&aliases); err != nil {
 		return aliases, err
 	}
 	return aliases, nil

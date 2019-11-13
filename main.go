@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -22,6 +23,10 @@ const (
 `
 )
 
+var (
+	force = flag.Bool("force", false, "Should command be created even if already present in path ?")
+)
+
 type alias struct {
 	Command string `json:"cmd"`
 	Package string `json:"pkg"`
@@ -29,6 +34,7 @@ type alias struct {
 }
 
 func main() {
+	flag.Parse()
 	home, err := homedir.Dir()
 	if err != nil {
 		log.Fatal(err)
@@ -45,7 +51,7 @@ func main() {
 	if err := cleanGenerated(home, profile); err != nil {
 		log.Fatal(err)
 	}
-	if err := generate(home, profile, aliases); err != nil {
+	if err := generate(home, profile, aliases, *force); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -94,10 +100,10 @@ func cleanGenerated(home, profile string) error {
 	return nil
 }
 
-func generate(home, profile string, aliases []alias) error {
+func generate(home, profile string, aliases []alias, force bool) error {
 	t := template.Must(template.New("cmd").Parse(cmdTmpl))
 	for _, a := range aliases {
-		if _, err := os.Stat(filepath.Join(home, ".nix-profile/bin/", a.Command)); os.IsNotExist(err) {
+		if _, err := os.Stat(filepath.Join(home, ".nix-profile/bin/", a.Command)); os.IsNotExist(err) || force {
 			// create command
 			pkg := a.Package
 			if pkg == "" {

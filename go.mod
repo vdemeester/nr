@@ -1,4 +1,4 @@
-module github.com/vdemeester/nr
+module go.sbr.pm/nr
 
 require github.com/mitchellh/go-homedir v1.1.0
 
